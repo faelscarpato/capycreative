@@ -8,6 +8,7 @@ import { saveAs } from 'file-saver';
 import { cn } from '@/lib/utils';
 import { ApiKeyModal } from './ApiKeyModal';
 import { PromptModal } from './PromptModal';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CodeEditorProps {
   className?: string;
@@ -175,24 +176,63 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   const handleCodeGeneration = async (prompt: string, type: 'code' | 'image') => {
-    if (type === 'image') {
-      toast.info('Funcionalidade de geração de imagem será implementada com Gemini!');
-      return;
-    }
-    
-    // Simulação de geração de código
-    toast.loading('Gerando código...', { id: 'code-gen' });
-    
-    setTimeout(() => {
-      if (activeTab === 'html') {
-        setHtmlCode(prev => prev + `\n<!-- Gerado por IA: ${prompt} -->\n<div class="ai-generated">\n    <p>Conteúdo gerado por IA</p>\n</div>`);
-      } else if (activeTab === 'css') {
-        setCssCode(prev => prev + `\n/* Gerado por IA: ${prompt} */\n.ai-generated {\n    border: 2px solid #007bff;\n    padding: 15px;\n    margin: 10px 0;\n    border-radius: 8px;\n}`);
-      } else if (activeTab === 'js') {
-        setJsCode(prev => prev + `\n// Gerado por IA: ${prompt}\nfunction aiFunction() {\n    console.log('Função gerada por IA');\n}`);
+    if (type === 'code') {
+      try {
+        toast.info('Gerando código...');
+        
+        const { data, error } = await supabase.functions.invoke('generate-code', {
+          body: {
+            prompt,
+            language: activeTab,
+            currentCode: getCurrentCode()
+          }
+        });
+
+        if (error) {
+          console.error('Error generating code:', error);
+          toast.error('Erro ao gerar código. Verifique se a API key está configurada.');
+          return;
+        }
+
+        if (data?.generatedCode) {
+          setCurrentCode(data.generatedCode);
+          toast.success('Código gerado com sucesso!');
+        } else {
+          toast.error('Não foi possível gerar o código.');
+        }
+      } catch (error) {
+        console.error('Error in code generation:', error);
+        toast.error('Erro ao gerar código.');
       }
-      toast.success('Código gerado com sucesso!', { id: 'code-gen' });
-    }, 2000);
+    } else {
+      try {
+        toast.info('Gerando imagem...');
+        
+        const { data, error } = await supabase.functions.invoke('generate-image', {
+          body: {
+            prompt,
+            projectId: null // Could be linked to a project in the future
+          }
+        });
+
+        if (error) {
+          console.error('Error generating image:', error);
+          toast.error('Erro ao gerar imagem. Verifique se a API key está configurada.');
+          return;
+        }
+
+        if (data?.imageUrl) {
+          toast.success('Imagem gerada com sucesso!');
+          // You could open the image in a new tab or display it somewhere
+          window.open(data.imageUrl, '_blank');
+        } else {
+          toast.error('Não foi possível gerar a imagem.');
+        }
+      } catch (error) {
+        console.error('Error in image generation:', error);
+        toast.error('Erro ao gerar imagem.');
+      }
+    }
   };
 
   useEffect(() => {

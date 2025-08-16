@@ -352,6 +352,41 @@ export type Database = {
         }
         Relationships: []
       }
+      generated_images: {
+        Row: {
+          created_at: string | null
+          id: string
+          image_url: string
+          project_id: string | null
+          prompt: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          image_url: string
+          project_id?: string | null
+          prompt: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          image_url?: string
+          project_id?: string | null
+          prompt?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generated_images_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       instrumentos_qualidade: {
         Row: {
           codigo_instrumento: string
@@ -1357,6 +1392,45 @@ export type Database = {
         }
         Relationships: []
       }
+      projects: {
+        Row: {
+          created_at: string | null
+          css_code: string | null
+          description: string | null
+          html_code: string | null
+          id: string
+          is_public: boolean | null
+          js_code: string | null
+          title: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          css_code?: string | null
+          description?: string | null
+          html_code?: string | null
+          id?: string
+          is_public?: boolean | null
+          js_code?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          css_code?: string | null
+          description?: string | null
+          html_code?: string | null
+          id?: string
+          is_public?: boolean | null
+          js_code?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       registros_inspecao_qualidade: {
         Row: {
           created_at: string | null
@@ -1710,6 +1784,36 @@ export type Database = {
           progress?: number | null
           status?: string
           title?: string
+        }
+        Relationships: []
+      }
+      user_settings: {
+        Row: {
+          auto_save: boolean | null
+          created_at: string | null
+          gemini_api_key: string | null
+          id: string
+          theme: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          auto_save?: boolean | null
+          created_at?: string | null
+          gemini_api_key?: string | null
+          id?: string
+          theme?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          auto_save?: boolean | null
+          created_at?: string | null
+          gemini_api_key?: string | null
+          id?: string
+          theme?: string | null
+          updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
